@@ -73,8 +73,8 @@ textarea:focus-visible,.btn:focus-visible{outline:3px solid var(--soft);outline-
 </header>
 <div><h1>FLYX</h1><p class="tag">SONHE MESMO NO CAOS</p></div>
 <section class="box">
-<h2>OTIMIZAÇÃO FLYX</h2>
-<textarea id="t1" readonly aria-label="Otimização FLYX">-- Made by FLYX_333
+<h2>OTIMIZAÇÃO FLYX cinza (32 bit)</h2>
+<textarea id="t1" readonly aria-label="Otimização FLYX cinza 32 bit">-- Made by FLYX_333
 -- Discord: https://discord.gg/5wrt6jBun7
 
 local Lighting = game:GetService("Lighting")
@@ -265,7 +265,200 @@ print("FLYX FPS Booster ativo | discord.gg/5wrt6jBun7")</textarea>
 <button class="btn" data-for="t1">Copiar</button>
 </section>
 <section class="box">
-<a class="btn" style="margin:0" href="https://www.mediafire.com/file/dqli6nwwbc24kfg/Delta-2.740.931_%28canalBIELSCRIPT%29.apk/file?dkey=frs4w2lg68h&amp;r=1790" target="_blank" rel="noopener">⬇ Baixar Delta</a>
+<h2>OTIMIZAÇÃO FLYX V2 normal (64 bit)</h2>
+<textarea id="t2" readonly aria-label="Otimização FLYX V2 normal 64 bit">-- Made by FLYX_333
+-- Discord: https://discord.gg/5wrt6jBun7
+
+local Lighting = game:GetService("Lighting")
+local Workspace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local GRAY = Color3.fromRGB(128, 128, 128)
+
+local CFG = {
+    TexturasLisas = true,       -- remove texturas e deixa tudo liso
+    CinzaLiso = false,          -- true = também pinta tudo de cinza
+    ReduzirBrilho = true,       -- tira Neon, luzes, Bloom, SunRays
+    ReduzirEfeitos = true,      -- desliga partículas, trails e beams
+    CongelarAnimOutros = false, -- para animações de outros jogadores
+    EsconderOutros = true,      -- deixa outros jogadores invisíveis
+    FPSCap = 120,               -- limite de FPS (0 para não mexer)
+}
+
+-- Mensagem na tela
+task.spawn(function()
+    local ok, parent = pcall(function()
+        return (gethui and gethui()) or game:GetService("CoreGui")
+    end)
+    if not ok or not parent then
+        parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+    end
+
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "FLYXAviso"
+    gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
+    gui.Parent = parent
+
+    local frame = Instance.new("Frame")
+    frame.AnchorPoint = Vector2.new(0.5, 0)
+    frame.Position = UDim2.new(0.5, 0, 0, -60)
+    frame.Size = UDim2.new(0, 260, 0, 44)
+    frame.BackgroundColor3 = Color3.fromRGB(15, 0, 25)
+    frame.BorderSizePixel = 0
+    frame.Parent = gui
+
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+    local stroke = Instance.new("UIStroke", frame)
+    stroke.Color = Color3.fromRGB(150, 60, 255)
+    stroke.Thickness = 2
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = "feito por @flyx_333"
+    label.TextColor3 = Color3.fromRGB(190, 120, 255)
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 18
+    label.Parent = frame
+
+    local info = TweenInfo.new(0.5, Enum.EasingStyle.Quad)
+    TweenService:Create(frame, info, {Position = UDim2.new(0.5, 0, 0, 20)}):Play()
+    task.wait(4)
+    TweenService:Create(frame, info, {Position = UDim2.new(0.5, 0, 0, -60)}):Play()
+    task.wait(0.6)
+    gui:Destroy()
+end)
+
+local function clean(v)
+    if v:IsA("BasePart") then
+        if CFG.TexturasLisas then
+            v.Material = Enum.Material.SmoothPlastic
+            v.Reflectance = 0
+            v.CastShadow = false
+            if CFG.CinzaLiso then v.Color = GRAY end
+            if v:IsA("MeshPart") then
+                v.TextureID = ""
+                pcall(function() v.RenderFidelity = Enum.RenderFidelity.Performance end)
+            end
+        elseif CFG.ReduzirBrilho and v.Material == Enum.Material.Neon then
+            v.Material = Enum.Material.SmoothPlastic
+        end
+    elseif v:IsA("SpecialMesh") then
+        if CFG.TexturasLisas then v.TextureId = "" end
+    elseif v:IsA("Decal") or v:IsA("Texture") or v:IsA("SurfaceAppearance")
+        or v:IsA("Shirt") or v:IsA("Pants") or v:IsA("ShirtGraphic") then
+        if CFG.TexturasLisas then v:Destroy() end
+    elseif v:IsA("Light") then
+        if CFG.ReduzirBrilho then v.Enabled = false end
+    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") or v:IsA("Smoke")
+        or v:IsA("Fire") or v:IsA("Sparkles") or v:IsA("Beam") then
+        if CFG.ReduzirEfeitos then v.Enabled = false end
+    elseif v:IsA("PostEffect") then
+        if CFG.ReduzirBrilho then v.Enabled = false end
+    elseif v:IsA("Atmosphere") then
+        v:Destroy()
+    elseif v:IsA("Explosion") then
+        v.Visible = false
+    end
+end
+
+-- Lighting / gráficos
+pcall(function()
+    Lighting.GlobalShadows = false
+    Lighting.FogEnd = 9e9
+    if CFG.CinzaLiso then
+        Lighting.Brightness = 2
+        Lighting.Ambient = GRAY
+        Lighting.OutdoorAmbient = GRAY
+    end
+    settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+end)
+
+-- Extras de FPS
+pcall(function()
+    if setfpscap and CFG.FPSCap &gt; 0 then setfpscap(CFG.FPSCap) end
+end)
+pcall(function()
+    sethiddenproperty(Lighting, "Technology", Enum.Technology.Compatibility)
+end)
+pcall(function()
+    settings().Rendering.MeshPartDetailLevel = Enum.MeshPartDetailLevel.Level04
+end)
+pcall(function()
+    settings().Rendering.EagerBulkExecution = true
+end)
+
+-- Terreno e água
+pcall(function()
+    local t = Workspace.Terrain
+    t.WaterWaveSize = 0
+    t.WaterWaveSpeed = 0
+    t.WaterReflectance = 0
+    t.WaterTransparency = 0
+    t.Decoration = false
+end)
+
+for _, v in ipairs(Lighting:GetDescendants()) do clean(v) end
+Lighting.DescendantAdded:Connect(function(v) task.defer(clean, v) end)
+
+-- Aplica em tudo (em lotes pra não travar)
+local n = 0
+for _, v in ipairs(Workspace:GetDescendants()) do
+    clean(v)
+    n += 1
+    if n % 500 == 0 then task.wait() end
+end
+
+-- Pega o que aparecer depois (skills, efeitos de fruta, etc.)
+Workspace.DescendantAdded:Connect(function(v) task.defer(clean, v) end)
+
+-- Animações de outros jogadores (opcional)
+if CFG.CongelarAnimOutros then
+    local function hookAnim(char)
+        local hum = char:WaitForChild("Humanoid", 5)
+        local animator = hum and hum:WaitForChild("Animator", 5)
+        if animator then
+            animator.AnimationPlayed:Connect(function(track) track:Stop() end)
+        end
+    end
+    for _, pl in ipairs(Players:GetPlayers()) do
+        if pl ~= Players.LocalPlayer then
+            if pl.Character then task.spawn(hookAnim, pl.Character) end
+            pl.CharacterAdded:Connect(hookAnim)
+        end
+    end
+    Players.PlayerAdded:Connect(function(pl)
+        pl.CharacterAdded:Connect(hookAnim)
+    end)
+end
+
+-- Esconde outros jogadores
+if CFG.EsconderOutros then
+    local function hide(char)
+        task.wait(0.5)
+        for _, p in ipairs(char:GetDescendants()) do
+            if p:IsA("BasePart") or p:IsA("Decal") then
+                p.Transparency = 1
+            end
+        end
+    end
+    for _, pl in ipairs(Players:GetPlayers()) do
+        if pl ~= Players.LocalPlayer then
+            if pl.Character then task.spawn(hide, pl.Character) end
+            pl.CharacterAdded:Connect(hide)
+        end
+    end
+    Players.PlayerAdded:Connect(function(pl)
+        pl.CharacterAdded:Connect(hide)
+    end)
+end
+
+print("FLYX FPS Booster ativo | discord.gg/5wrt6jBun7")</textarea>
+<button class="btn" data-for="t2">Copiar</button>
+</section>
+<section class="box">
+<a class="btn" style="margin:0" href="https://www.mediafire.com/file/dqli6nwwbc24kfg/Delta-2.740.931_%2528canalBIELSCRIPT%2529.apk/file" target="_blank" rel="noopener">⬇ Baixar Delta</a>
 <a class="btn dark" href="https://discord.gg/N63F77m52" target="_blank" rel="noopener">Entre no nosso servidor</a>
 </section>
 <section class="box social">
